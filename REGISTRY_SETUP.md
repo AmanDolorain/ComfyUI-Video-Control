@@ -1,9 +1,9 @@
 # Publish Video Control to Comfy Registry
 
 Publisher ID: `amandolorain`
-Display name: `Video Control`
+Display name: `ComfyUI-Video-Control`
 Package ID: `comfyui-video-control`
-Prepared version: `1.1.3`
+Prepared version: `1.1.5`
 
 This package is prepared for publication. Registry availability is not confirmed until publishing and any applicable registry checks succeed. If the package ID is already owned by another publisher, choose a new available ID before the first successful publication.
 

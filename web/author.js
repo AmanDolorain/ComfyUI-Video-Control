@@ -1,38 +1,44 @@
 import { app } from "../../scripts/app.js";
 
+const decorated = Symbol("videoControlAuthorFooter");
+
 app.registerExtension({
     name: "VideoControl.AuthorCredit",
     nodeCreated(node) {
-        if (node.comfyClass !== "VideoControl") return;
-        if (node.widgets?.some((widget) => widget.name === "video_control_author")) return;
+        if (node.comfyClass !== "VideoControl" || node[decorated]) return;
+        node[decorated] = true;
 
-        const label = document.createElement("div");
-        label.textContent = "Author: Aman";
-        label.title = "Video Control — Author: Aman";
-        Object.assign(label.style, {
-            color: "var(--descrip-text, #b8b8b8)",
-            font: "10px sans-serif",
-            opacity: "0.65",
-            display: "flex",
-            alignItems: "flex-end",
-            justifyContent: "flex-end",
-            boxSizing: "border-box",
-            width: "100%",
-            height: "18px",
-            padding: "0 8px 2px 0",
-            whiteSpace: "nowrap",
-            pointerEvents: "none",
-        });
+        // Reserve a footer below the controls, rather than inserting a widget row.
+        const computeSize = node.computeSize;
+        node.computeSize = function (...args) {
+            const size = computeSize.apply(this, args);
+            return [Math.max(size[0], 300), size[1] + 24];
+        };
 
-        // Display only: no model input, editable setting, output, or saved value.
-        const widget = node.addDOMWidget("video_control_author", "video_control_credit", label, {
-            serialize: false,
-            hideOnZoom: true,
-            getValue: () => undefined,
-            setValue: () => {},
-        });
-        widget.computeSize = () => [0, 18];
-        const size = node.computeSize();
-        node.setSize([Math.max(node.size[0], size[0]), Math.max(node.size[1], size[1])]);
+        // Anchor to the actual node boundary, including after manual resizing.
+        // Keep the lower-left package badge free and draw no clickable overlay.
+        const drawForeground = node.onDrawForeground;
+        node.onDrawForeground = function (ctx, ...args) {
+            const result = drawForeground?.call(this, ctx, ...args);
+            if (this.flags?.collapsed) return result;
+            ctx.save();
+            try {
+                ctx.font = "10px sans-serif";
+                ctx.fillStyle = "#9aa0a6";
+                ctx.globalAlpha *= 0.7;
+                ctx.textAlign = "right";
+                ctx.textBaseline = "middle";
+                ctx.fillText("Author: Aman", this.size[0] - 12, this.size[1] - 18);
+            } finally {
+                ctx.restore();
+            }
+            return result;
+        };
+        const minimum = node.computeSize();
+        node.setSize([
+            Math.max(node.size[0], minimum[0]),
+            Math.max(node.size[1], minimum[1]),
+        ]);
+        node.setDirtyCanvas?.(true, true);
     },
 });

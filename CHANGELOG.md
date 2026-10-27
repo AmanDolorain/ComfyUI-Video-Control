@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.1.5
+
+- Use ComfyUI-Video-Control as the Registry/Manager display name and canvas node title.
+- Expand the description with accurate feature search terms.
+- Replace the author widget row with credit anchored to the bottom-right canvas footer.
+- Keep the package ID, node ID, controls and outputs unchanged.
+
+
+## 1.1.4
+
+- Set Registry/Manager display name to ComfyUI / Video / Control.
+- Set canvas search category to ComfyUI/Video/Control.
+- Preserve the Video Control node title, package ID, registered node ID and output sockets.
+
+
 ## 1.1.3
 
 - Move author credit to the right side of a compact footer row.

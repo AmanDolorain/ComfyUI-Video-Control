@@ -2,7 +2,7 @@
 No external downloads, model loading, disk encoding, or network calls.
 """
 __author__ = "Aman"
-__version__ = "1.1.3"
+__version__ = "1.1.5"
 WEB_DIRECTORY = "./web"
 
 from .calculations import make_plan, RESOLUTION_PRESETS
@@ -34,7 +34,7 @@ class VideoControl:
     RETURN_TYPES = ('LATENT','VHS_VIDEOINFO','INT','FLOAT','FLOAT','INT','INT','STRING')
     RETURN_NAMES = ('latent','video_info','frame_count','fps','actual_duration_seconds','width','height','summary')
     FUNCTION = 'build'
-    CATEGORY = 'Video/Control'
+    CATEGORY = 'ComfyUI/Video/Control'
     DESCRIPTION = 'Author: Aman. Shared video settings and a 16-channel video empty latent. Not other latent formats.'
 
     # 3. ComfyUI runs this method only when this node's outputs are needed.
@@ -57,4 +57,4 @@ class VideoControl:
 
 # 4. Registration lets ComfyUI discover the node and its searchable display name.
 NODE_CLASS_MAPPINGS = {'VideoControl':VideoControl}
-NODE_DISPLAY_NAME_MAPPINGS = {'VideoControl':'Video Control'}
+NODE_DISPLAY_NAME_MAPPINGS = {'VideoControl':'ComfyUI-Video-Control'}
