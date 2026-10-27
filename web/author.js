@@ -11,11 +11,16 @@ app.registerExtension({
         label.title = "Video Control — Author: Aman";
         Object.assign(label.style, {
             color: "var(--descrip-text, #b8b8b8)",
-            font: "12px sans-serif",
+            font: "10px sans-serif",
+            opacity: "0.65",
             display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            height: "24px",
+            alignItems: "flex-end",
+            justifyContent: "flex-end",
+            boxSizing: "border-box",
+            width: "100%",
+            height: "18px",
+            padding: "0 8px 2px 0",
+            whiteSpace: "nowrap",
             pointerEvents: "none",
         });
 
@@ -26,7 +31,7 @@ app.registerExtension({
             getValue: () => undefined,
             setValue: () => {},
         });
-        widget.computeSize = () => [0, 24];
+        widget.computeSize = () => [0, 18];
         const size = node.computeSize();
         node.setSize([Math.max(node.size[0], size[0]), Math.max(node.size[1], size[1])]);
     },

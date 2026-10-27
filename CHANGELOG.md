@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.3
+
+- Move author credit to the right side of a compact footer row.
+- Use smaller, muted text and reduce footer height from 24 to 18 pixels.
+- Keep all backend controls, output sockets and calculations unchanged.
+
+
 ## 1.1.2
 
 - Configure Comfy Registry publisher amandolorain.

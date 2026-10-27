@@ -3,7 +3,7 @@
 Publisher ID: `amandolorain`
 Display name: `Video Control`
 Package ID: `comfyui-video-control`
-Prepared version: `1.1.2`
+Prepared version: `1.1.3`
 
 This package is prepared for publication. Registry availability is not confirmed until publishing and any applicable registry checks succeed. If the package ID is already owned by another publisher, choose a new available ID before the first successful publication.
 
@@ -17,7 +17,7 @@ In the GitHub repository, open Settings > Secrets and variables > Actions > New 
 
 Upload the contents inside VideoControl to the repository root, including the new `.github/workflows/publish.yml`. The existing `.github/workflows/tests.yml` and `.gitignore` are unchanged. If browser upload omits the .github directory, use Add file > Create new file, name it `.github/workflows/publish.yml`, and paste the contents from this package.
 
-Suggested commit message: `Configure Comfy Registry publishing v1.1.2`.
+Suggested commit message: `Configure Comfy Registry publishing v1.1.3`.
 
 ## 3. Publish and verify
 

@@ -1,6 +1,6 @@
 # Video Control
 
-**Author: Aman · Version: 1.1.2 · ComfyUI custom node**
+**Author: Aman · Version: 1.1.3 · ComfyUI custom node**
 
 One control node for video duration, FPS, resolution, an empty video latent, and planned VHS video metadata. Set the timing once and connect its outputs across your workflow.
 
@@ -104,4 +104,4 @@ MIT. See [LICENSE](LICENSE).
 
 ## Author credit display
 
-The frontend extension in `web/author.js` adds a read-only author label inside Video Control. It does not add a backend input or change output sockets. After updating, restart ComfyUI and hard-refresh the browser (Ctrl+F5). Add a fresh Video Control node if needed. Actual rendering must be verified in your ComfyUI frontend.
+The frontend extension in `web/author.js` adds a small, muted, right-aligned author label in a compact footer row inside Video Control. It does not add a backend input or change output sockets. After updating, restart ComfyUI and hard-refresh the browser (Ctrl+F5). Add a fresh Video Control node if needed. Actual rendering must be verified in your ComfyUI frontend.
