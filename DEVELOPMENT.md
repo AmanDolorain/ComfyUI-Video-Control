@@ -19,6 +19,12 @@ Author: Aman
 6. Register the class in `NODE_CLASS_MAPPINGS`. Set its searchable name in `NODE_DISPLAY_NAME_MAPPINGS`.
 7. Restart ComfyUI. If importing fails, inspect the startup console for the full Python error.
 
+## Resolution handling
+
+`resolution_preset` and `size_rounding` are optional inputs appended after the existing controls. Existing output positions and the node registration ID remain unchanged. `resolve_resolution` validates custom input or selects a preset, then aligns the output dimensions. It returns requested width, requested height, actual width and actual height. All tensor allocation, dimension outputs and VHS metadata use actual dimensions.
+
+The width and height widgets now use a minimum of 1 and a step of 1. Internal alignment remains 16 for the supported latent format; changing the input controls does not change the model architecture. Exact mode rejects unsupported sizes. Automatic modes clamp dimensions smaller than 16 to 16. A preset overrides both custom input dimensions. Rounding is independent per dimension and can change aspect ratio slightly.
+
 ## Timing and tensor allocation
 
 The calculation module converts seconds and FPS into a frame count satisfying `4n + 1`. The selected rounding mode determines whether to choose the nearest, higher or lower valid count. Actual duration is frame count divided by FPS.

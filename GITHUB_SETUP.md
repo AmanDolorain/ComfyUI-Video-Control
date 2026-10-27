@@ -2,7 +2,18 @@
 
 Author: Aman
 
-This package is ready to upload. It has not yet been published to a GitHub repository.
+The repository is https://github.com/AmanDolorain/ComfyUI-Video-Control. This update package is prepared locally; it is not published until its files are committed to that repository.
+
+## Update the existing repository
+
+1. Extract this update ZIP and open the inner VideoControl directory.
+2. In the repository, choose Add file / Upload files.
+3. Upload the contents of that directory at the repository root, keeping the tests and .github subdirectories intact. Do not upload the outer folder or ZIP.
+4. Use the commit message `Add custom resolution rounding and 4K presets (v1.1.0)`.
+5. Check the Actions tab after committing. An actual ComfyUI generation test is still separate.
+6. Existing users can update their Git installation and restart ComfyUI.
+
+The following sections also describe creating a separate repository if needed.
 
 ## Create an account and repository
 
@@ -33,13 +44,13 @@ Configure your Git name and email if Git requests them. Authenticate through you
 
 ## Install from the repository URL
 
-After publishing, copy the HTTPS URL from the repository's Code menu. Use your ComfyUI Manager's Git URL installation option if available, or run the following inside `ComfyUI/custom_nodes`:
+Copy the HTTPS URL from the repository's Code menu. Use your ComfyUI Manager's Git URL installation option if available, or run the following inside `ComfyUI/custom_nodes`:
 
 ```bash
-git clone https://github.com/USERNAME/ComfyUI-Video-Control.git
+git clone https://github.com/AmanDolorain/ComfyUI-Video-Control.git
 ```
 
-Restart ComfyUI. USERNAME is a placeholder, not a published URL. Do not keep another active copy installed from the ZIP.
+Restart ComfyUI. Do not keep another active copy installed from the ZIP.
 
 For future updates, run `git pull` inside the installed repository directory and restart ComfyUI.
 
