@@ -1,0 +1,8 @@
+[project]
+name = "comfyui-video-control"
+version = "1.0.7"
+description = "Shared video settings, empty latent and video metadata for ComfyUI"
+authors = [{name = "Aman"}]
+requires-python = ">=3.10"
+license = {file = "LICENSE"}
+readme = "README.md"
