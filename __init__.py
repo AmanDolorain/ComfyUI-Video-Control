@@ -1,8 +1,8 @@
 """Video Control: settings + 16-channel video format empty latent + VHS video metadata.
 No external downloads, model loading, disk encoding, or network calls.
 """
-__author__ = "Aman"
-__version__ = "1.1.5"
+__author__ = "Aman Dolorain"
+__version__ = "1.1.6"
 WEB_DIRECTORY = "./web"
 
 from .calculations import make_plan, RESOLUTION_PRESETS
@@ -35,7 +35,7 @@ class VideoControl:
     RETURN_NAMES = ('latent','video_info','frame_count','fps','actual_duration_seconds','width','height','summary')
     FUNCTION = 'build'
     CATEGORY = 'ComfyUI/Video/Control'
-    DESCRIPTION = 'Author: Aman. Shared video settings and a 16-channel video empty latent. Not other latent formats.'
+    DESCRIPTION = 'Author: Aman Dolorain. Shared video settings and a 16-channel video empty latent. Not other latent formats.'
 
     # 3. ComfyUI runs this method only when this node's outputs are needed.
     def build(self, duration_seconds, fps, width, height, frame_rounding='nearest', batch_size=1,

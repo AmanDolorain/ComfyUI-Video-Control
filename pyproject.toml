@@ -1,8 +1,8 @@
 [project]
 name = "comfyui-video-control"
-version = "1.1.5"
+version = "1.1.6"
 description = "ComfyUI Video Control: duration, FPS, resolution presets, automatic size rounding, empty video latent and VHS video metadata."
-authors = [{name = "Aman"}]
+authors = [{name = "Aman Dolorain"}]
 requires-python = ">=3.10"
 license = {file = "LICENSE"}
 readme = "README.md"

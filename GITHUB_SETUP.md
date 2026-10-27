@@ -1,6 +1,6 @@
 # Publishing Video Control on GitHub
 
-Author: Aman
+Author: Aman Dolorain
 
 The repository is https://github.com/AmanDolorain/ComfyUI-Video-Control. This update package is prepared locally; it is not published until its files are committed to that repository.
 
@@ -9,7 +9,7 @@ The repository is https://github.com/AmanDolorain/ComfyUI-Video-Control. This up
 1. Extract this update ZIP and open the inner VideoControl directory.
 2. In the repository, choose Add file / Upload files.
 3. Upload the contents of that directory at the repository root, keeping the tests and .github subdirectories intact. Do not upload the outer folder or ZIP.
-4. Use the commit message `Fix searchable title and bottom-corner author credit (v1.1.5)`.
+4. Use the commit message `Fix Vue author footer compatibility (v1.1.6)`.
 5. Check the Actions tab after committing. An actual ComfyUI generation test is still separate.
 6. Existing users can update their Git installation and restart ComfyUI.
 
@@ -20,7 +20,7 @@ The following sections also describe creating a separate repository if needed.
 1. If needed, create your account at https://github.com/signup and verify your email. Keep your password private.
 2. Sign in and open https://github.com/new.
 3. Use `ComfyUI-Video-Control` as the repository name.
-4. Suggested description: `Shared video timing, empty latent and planned video metadata for ComfyUI. Author: Aman.`
+4. Suggested description: `Shared video timing, empty latent and planned video metadata for ComfyUI. Author: Aman Dolorain.`
 5. Choose Public to let others install from the repository URL. This package already includes a README and MIT license.
 6. Create the repository. Upload the contents **inside** the extracted `VideoControl` directory, rather than uploading the ZIP or nesting that directory inside the repository.
 7. Commit the files. The repository root should contain `__init__.py`, `calculations.py`, `README.md`, `pyproject.toml`, `LICENSE`, and `tests`.

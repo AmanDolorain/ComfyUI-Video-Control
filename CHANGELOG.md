@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.1.6
+
+- Fix missing author credit with the Vue Nodes 2.0 renderer.
+- Use the full author credit Aman Dolorain in the footer and package metadata.
+- Place credit in the native bottom badge row; keep classic canvas fallback.
+- Handle hidden badges, remounting, collapse and node removal.
+- Preserve ComfyUI-Video-Control naming and all backend inputs and outputs.
+
+
 ## 1.1.5
 
 - Use ComfyUI-Video-Control as the Registry/Manager display name and canvas node title.

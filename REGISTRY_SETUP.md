@@ -3,7 +3,7 @@
 Publisher ID: `amandolorain`
 Display name: `ComfyUI-Video-Control`
 Package ID: `comfyui-video-control`
-Prepared version: `1.1.5`
+Prepared version: `1.1.6`
 
 This package is prepared for publication. Registry availability is not confirmed until publishing and any applicable registry checks succeed. If the package ID is already owned by another publisher, choose a new available ID before the first successful publication.
 
@@ -28,3 +28,7 @@ After success, check the Registry publisher page for the node and version. Regis
 For later releases, increment the version in pyproject.toml, __init__.py and README, commit the changes and check Actions. An already published version cannot be overwritten. GitHub commits without a version bump do not replace a published registry release.
 
 GitHub hosts the source, the Registry distributes versioned packages, and Manager installs a local copy. Manager updates still require an update action and a ComfyUI restart.
+
+## Listing metadata and cache
+
+The Registry node-level name is distinct from the installed canvas title and individual version records. Confirm the title on the Registry detail page. If it already reads ComfyUI-Video-Control, leave it unchanged. Manager may hold an older Registry cache even when the legacy channel DB is set to remote. Do not delete versions to fix a cached title.

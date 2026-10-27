@@ -1,6 +1,6 @@
 # ComfyUI-Video-Control
 
-**Author: Aman · Version: 1.1.5 · ComfyUI custom node**
+**Author: Aman Dolorain · Version: 1.1.6 · ComfyUI custom node**
 
 One control node for video duration, FPS, resolution, an empty video latent, and planned VHS video metadata. Set the timing once and connect its outputs across your workflow.
 
@@ -16,7 +16,7 @@ One control node for video duration, FPS, resolution, an empty video latent, and
 - `VHS_VIDEOINFO` metadata without saving and reopening an intermediate video.
 - Actual duration output for an audio generator's duration input.
 - No model downloads, network calls or extra Python packages.
-- Small `Author: Aman` credit anchored to the bottom-right footer, with attribution in the description.
+- Small `Author: Aman Dolorain` credit anchored to the bottom-right footer, with attribution in the description.
 
 ## Compatibility
 
@@ -104,12 +104,16 @@ MIT. See [LICENSE](LICENSE).
 
 ## Author credit display
 
-The frontend extension in `web/author.js` draws a small, muted author credit at the actual bottom-right boundary of the canvas node, on the footer line beside the lower-left package badge. It follows the node boundary after resizing. The credit is no longer a DOM widget below the controls and has no clickable overlay. The renderer reserves 24 pixels of footer space to keep controls clear.
+The frontend extension in `web/author.js` supports two rendering paths. In Vue Nodes 2.0 it mounts a non-interactive, muted credit inside the existing bottom badge row, right-aligned beside the package badge. If badges are hidden, it creates a compact footer row. In classic Canvas mode it uses a bottom-right drawing fallback. The extension removes its credit when the node is removed and handles collapse/expand and Vue remounts.
 
-This implementation uses the classic LiteGraph canvas rendering hook. Alternate renderers such as Nodes 2.0 may not draw that hook; author attribution remains in the node description. Actual placement must be checked in your installed frontend. After updating, restart ComfyUI, hard-refresh the browser (Ctrl+F5) and add a fresh node if necessary.
+This replaces the canvas-only approach from 1.1.5, which can show no author in Vue rendering. No backend input, output, tensor calculation or saved widget value is added. After updating, restart ComfyUI and hard-refresh the browser (Ctrl+F5). Actual ComfyUI rendering must still be verified in the installed frontend; the development checks are not an end-to-end ComfyUI test.
 
 ## Names and discovery
 
 Search for **ComfyUI-Video-Control**. The Registry/Manager display name and the default canvas title both use that spelling, with hyphens. The category remains `ComfyUI/Video/Control`. The immutable package ID remains `comfyui-video-control`, and the registered node ID remains `VideoControl`, preserving workflow links. Existing saved workflows may retain their old node titles until a fresh node is added.
 
 The description includes duration, FPS, resolution presets, automatic rounding, empty latent and VHS metadata. Listing cache refresh and registry metadata processing can delay a title change. Search placement, ratings and ranking are controlled by the listing service; no top-position guarantee is made.
+
+## Manager title versus installed node title
+
+Manager's listing reads the Registry node-level name. The canvas title comes from NODE_DISPLAY_NAME_MAPPINGS in the installed Python package. Updating one does not immediately refresh the other. Registry has an Edit details form for the node name, independent of version history. Once the Registry title is ComfyUI-Video-Control, do not repeatedly rename it or publish additional code changes solely to refresh Manager. Wait for the Registry cache fetch to finish and reopen the list.
