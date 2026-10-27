@@ -2,7 +2,7 @@
 No external downloads, model loading, disk encoding, or network calls.
 """
 __author__ = "Aman"
-__version__ = "1.1.1"
+__version__ = "1.1.2"
 WEB_DIRECTORY = "./web"
 
 from .calculations import make_plan, RESOLUTION_PRESETS

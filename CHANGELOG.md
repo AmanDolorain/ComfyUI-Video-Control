@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.2
+
+- Configure Comfy Registry publisher amandolorain.
+- Add a GitHub Actions publishing workflow, gated by the Python tests.
+- Document publishing secrets, releases and verification.
+
+
 ## 1.1.1
 
 - Show a read-only Author: Aman label inside Video Control.

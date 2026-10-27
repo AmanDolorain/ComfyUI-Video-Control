@@ -1,10 +1,10 @@
 # Video Control
 
-**Author: Aman · Version: 1.1.1 · ComfyUI custom node**
+**Author: Aman · Version: 1.1.2 · ComfyUI custom node**
 
 One control node for video duration, FPS, resolution, an empty video latent, and planned VHS video metadata. Set the timing once and connect its outputs across your workflow.
 
-[Publish on GitHub](GITHUB_SETUP.md) · [Custom node development guide](DEVELOPMENT.md)
+[Registry publishing](REGISTRY_SETUP.md) · [Publish on GitHub](GITHUB_SETUP.md) · [Custom node development guide](DEVELOPMENT.md)
 
 ## Features
 
