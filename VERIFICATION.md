@@ -1,31 +1,18 @@
-# Verification for 1.1.6
+# Verification — 1.2.0
 
-## Source review
+15 isolated unit tests pass. No real ComfyUI inference or GPU generation was run in the build environment.
 
-Reviewed the official ComfyUI frontend sources for the Vue node container and bottom badge row:
+The adapter was checked against the upstream `comfy_extras/nodes_hunyuan.py` source fetched on 2026-10-27. Native execute accepts positive, vae, width, height, length, batch_size, guidance_type and start_image and returns conditioning plus latent. Current NodeOutput.result and legacy tuple returns are supported. The old encode method alias is also supported.
 
-- https://github.com/Comfy-Org/ComfyUI_frontend/blob/main/src/renderer/extensions/vueNodes/components/LGraphNode.vue
-- https://github.com/Comfy-Org/ComfyUI_frontend/blob/main/src/renderer/extensions/vueNodes/components/NodeBadges.vue
-- https://github.com/Comfy-Org/ComfyUI-Manager/blob/main/glob/manager_core.py
-- https://github.com/Comfy-Org/ComfyUI-Manager/blob/main/glob/manager_server.py
-- https://github.com/Comfy-Org/ComfyUI-Manager/blob/main/glob/cnr_utils.py
+Tests verify input completeness, forwarded actual rounded dimensions and frame count, output indices, metadata, and preservation of returned conditioning and noise masks. These are mocked integration contracts, not a substitute for inference.
 
-The Vue implementation places the package/source badges in a direct bottom `.mt-auto` row inside the node body. This update attaches the author to that same row. It does not rely solely on the classic canvas foreground callback.
+## On-machine acceptance test
 
-Manager obtains the title of a Registry-only pack from the Registry node name. The channel-list mode and Registry cache are distinct in the reviewed Manager source. A correct Registry name can coexist with an old Manager title until its Registry metadata is refreshed.
-
-## Checks performed
-
-- All ten Python unit tests pass, including mocked tensor allocation.
-- A DOM test checks the native Vue row attachment, alignment styles, duplicate prevention, hidden-badge fallback, collapse/expand, remount and cleanup.
-- A headless Chromium test uses a fixture reproducing the relevant Vue node-body and badge-row structure. It verifies matching vertical centers for the package badge and full author name, right alignment after resize, non-interactive text, hidden/restored badges, collapse/expand, cleanup and the classic canvas fallback coordinates.
-
-These are not a full ComfyUI installation, model-generation test or a guarantee for every historical/future frontend release. The installed frontend remains the final integration check.
-
-## Update checklist
-
-Keep the Registry name `ComfyUI-Video-Control`; do not rename it again if already correct. Upload the contents of this package, including `web/author.js`, and commit with `Fix author footer compatibility and full author credit v1.1.6`.
-
-The `.github` directory and `.gitignore` are unchanged from 1.1.5. Author metadata and LICENSE now use Aman Dolorain. After successful publishing, update the installed pack, restart ComfyUI, hard-refresh the browser, and inspect a fresh node.
-
-If Manager still shows the old title, keep DB Channel remote and Channel default, use Check Update/Fetch Updates when available, and let `FETCH ComfyRegistry Data [DONE]` finish before reopening the list. Do not delete old versions or publish another patch just to refresh a cached title.
+1. Save a backup of the workflow. Update/restart ComfyUI and refresh the browser.
+2. Add a fresh controller. Confirm three image-to-video inputs and the final positive output.
+3. Use matching video models/VAE. Connect all three inputs, positive output to BasicGuider and latent to sampler.
+4. For 5 seconds, 25 FPS, 848 x 480, confirm 125 frames and a 5-second planned summary.
+5. With a fixed seed and identical inputs/settings, compare the controller branch to a separate native image-to-video node branch. Use one branch at a time; both call the same native preparation API.
+6. Check 512 x 512, rounded custom size, and legacy empty mode. Do not attempt a 4K test unless hardware permits it.
+7. Confirm actual decoded frame count and saved FPS; planned metadata alone is not a measurement.
+8. Confirm Author: Aman Dolorain remains in the footer. web/author.js is unchanged from 1.1.6.

@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.2.0
+
+- Add optional positive, vae and start_image inputs with all-or-none validation.
+- Delegate image-to-video preparation to ComfyUI's native implementation.
+- Append positive output while preserving the previous eight output indices.
+- Preserve returned conditioning, samples and noise masks without reconstruction.
+- Keep legacy empty-latent mode and resolution planning.
+- Add isolated adapter tests and document wiring and compatibility limits.
+- Product name, publisher, author footer, .gitignore and GitHub workflows remain unchanged.
+
+
+
 ## 1.1.6
 
 - Fix missing author credit with the Vue Nodes 2.0 renderer.

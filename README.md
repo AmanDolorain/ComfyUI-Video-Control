@@ -1,119 +1,66 @@
 # ComfyUI-Video-Control
 
-**Author: Aman Dolorain · Version: 1.1.6 · ComfyUI custom node**
+Author: **Aman Dolorain** · Version **1.2.0**
 
-One control node for video duration, FPS, resolution, an empty video latent, and planned VHS video metadata. Set the timing once and connect its outputs across your workflow.
+Shared video timing, resolution, image-to-video preparation and planned VHS metadata in one node.
 
-[Registry publishing](REGISTRY_SETUP.md) · [Publish on GitHub](GITHUB_SETUP.md) · [Custom node development guide](DEVELOPMENT.md)
+## What changed
 
-## Features
+Connect `positive`, `vae` and `start_image` directly to this controller. It now delegates reference-image resizing, VAE encoding, masks and conditioning to ComfyUI's native image-to-video implementation. A separate image-to-video preparation node is unnecessary for this supported path.
 
-- Duration in seconds, shared FPS and resolution.
-- Pixel-by-pixel custom resolution entry with automatic size rounding.
-- Tiny, square, landscape and portrait presets through UHD/DCI 4K.
-- Frame count rounded to the required `4n + 1` layout.
-- Empty 16-channel video latent with spatial compression 8 and temporal compression 4.
-- `VHS_VIDEOINFO` metadata without saving and reopening an intermediate video.
-- Actual duration output for an audio generator's duration input.
-- No model downloads, network calls or extra Python packages.
-- Small `Author: Aman Dolorain` credit anchored to the bottom-right footer, with attribution in the description.
+The original eight output sockets keep their positions. The new `positive` output is appended as output 9. Existing empty-latent workflows continue to work with all three new inputs disconnected. Connecting only some of them raises a clear error.
 
-## Compatibility
+## Image-to-video wiring
 
-This is **not a universal latent generator**. Your model must accept a tensor shaped `[1, 16, (frames-1)/4+1, height/8, width/8]`. Matching the LATENT socket alone does not prove model compatibility. The current node supports one video per run and whole-number FPS only. Custom width and height accept any whole number from 1 to 16384. Automatic modes align the generated size internally for this latent format. Exact mode only accepts already valid sizes. See Resolution controls below.
-
-Metadata describes the planned clip. If downstream nodes change frame count, resolution or FPS, that metadata must be updated. This node does not generate speech, force TTS duration, mix audio, or perform lip sync.
-
-## Install
-
-Extract the ZIP so that `ComfyUI/custom_nodes/VideoControl/__init__.py` exists, then restart ComfyUI. Search for **ComfyUI-Video-Control** under **ComfyUI / Video / Control**.
-
-Install from [the repository](https://github.com/AmanDolorain/ComfyUI-Video-Control) using your Manager's Git URL installation option, if available, or run this from `ComfyUI/custom_nodes`:
-
-```bash
-git clone https://github.com/AmanDolorain/ComfyUI-Video-Control.git
-```
-
-Do not install a second copy alongside the extracted version.
-
-Requires Python 3.10+ and ComfyUI's existing PyTorch installation. VHS and your audio/lip-sync nodes are separate workflow dependencies.
-
-## Connections
-
-| Output | Destination |
+| Source | Destination |
 | --- | --- |
-| `latent` | Your compatible sampler's latent input |
-| `video_info` | Lip-sync node's `VHS_VIDEOINFO` input, if exposed |
-| `frame_count` | A node explicitly requesting an INT frame count, if needed |
-| `fps` | Final video creator's FPS / frame_rate FLOAT input |
-| `actual_duration_seconds` | Audio generator's duration FLOAT input |
-| `width`, `height` | Any other resolution controls that must match |
-| `summary` | Preview / display text node |
+| CLIP Text Encode: CONDITIONING | Controller: positive input |
+| Matching Load VAE: VAE | Controller: vae input |
+| Load Image: IMAGE | Controller: start_image input |
+| Controller: positive output | BasicGuider: conditioning |
+| Controller: latent | SamplerCustomAdvanced: latent_image |
+| Controller: fps | Create Video: fps |
+| Controller: actual_duration_seconds | MMAudio Sampler: duration |
+| SamplerCustomAdvanced: output | VAE Decode: samples |
+| Matching Load VAE: VAE | VAE Decode: vae |
+| VAE Decode: IMAGE | Create Video: images and MMAudio Sampler: images |
+| MMAudio Sampler: audio | Create Video: audio |
+| Create Video: VIDEO | Save Video: video |
 
-Convert a destination widget to an input when needed. Do not connect `video_info` to a numeric socket or `latent` directly to an IMAGE socket. Decode the sampler's result with your compatible VAE before sending images to the final video creator. Keep the final video creator and audio mixer.
+Keep RandomNoise, KSamplerSelect, BasicScheduler and BasicGuider connected to SamplerCustomAdvanced as usual. Send the same patched MODEL to BasicGuider and BasicScheduler. The controller does not load models or replace a sampler.
 
-## Resolution controls
+Remove the separate image-to-video preparation node after reconnecting its conditioning and latent paths. Width, height and length are passed internally; do not keep that duplicate preparation branch. FPS remains a playback/timing setting, not an image-conditioning input.
 
-Choose `resolution_preset = Custom` to use the width and height fields. They accept whole pixels with a step of 1; you do not need to calculate multiples yourself. Selecting any other preset overrides both fields with the preset's requested dimensions. Preset names describe the **requested** size, before rounding.
+## Inputs and modes
 
-| size_rounding | Behavior |
-| --- | --- |
-| `nearest` (default) | Closest internally valid size; ties round upward |
-| `down` | Round each dimension downward; use this to avoid increasing normal requested dimensions |
-| `up` | Round each dimension upward |
-| `exact` | Keep the exact dimensions if supported; otherwise show an error instead of silently changing them |
+`duration_seconds`, `fps`, `width`, `height`, `frame_rounding`, `batch_size`, `resolution_preset` and `size_rounding` retain their previous meanings. All three optional sockets connected select image-to-video mode; none connected selects empty-latent mode.
 
-The latent format still requires internally aligned dimensions. Automatic modes handle alignment to 16 pixels for you. `exact` therefore accepts multiples of 16; unsupported exact sizes require a separate resize after decoding if you need an exact delivery resolution. The smallest internally representable size here is 16 x 16. Inputs below 16 round to 16 even in `down` mode.
+`guidance_type` must match the checkpoint: `v1 (concat)` is the default and matches the previously wired workflow; `v2 (replace)` and `custom` are passed unchanged to the native backend. Do not select one merely to improve quality.
 
-| Request | Mode | Actual generated size |
-| --- | --- | --- |
-| 854 x 479 | nearest | 848 x 480 |
-| 854 x 479 | down | 848 x 464 |
-| 854 x 479 | up | 864 x 480 |
-| 1920 x 1080 | nearest | 1920 x 1088 |
-| 1920 x 1080 | down | 1920 x 1072 |
-| 3840 x 2160 (UHD 4K) | nearest or exact | 3840 x 2160 |
-| 4096 x 2160 (DCI 4K) | nearest or exact | 4096 x 2160 |
-| 1 x 1 | nearest, down or up | 16 x 16 |
+## Compatibility and resolution
 
-Each dimension rounds independently, so the aspect ratio can change slightly. The node does not resize or crop input images. Connect its **width and height outputs**, rather than unrounded input values, to other resolution controls. Both metadata and latent allocation use the actual dimensions. The summary reports requested and actual size.
+This is **not a universal latent generator**. Image-to-video uses the native `HunyuanImageToVideo` implementation in `comfy_extras.nodes_hunyuan`. It requires a matching video checkpoint, conditioning and video VAE. It does not support H3, Wan or arbitrary image checkpoints merely because their sockets connect. Empty mode creates `[1, 16, (frames-1)/4+1, height/8, width/8]`.
 
-Presets include 64, 128 and 256 pixel squares, 360p, 480p, 512 square, 720p, 1080p, 1440p, UHD 4K, DCI 4K and portrait options. Small sizes are useful for trying the workflow, but the model may impose a larger minimum or have poor results at those sizes. 4K sizing support is not a guarantee that direct 4K generation fits your GPU. Memory also depends on model, duration, precision and other nodes. This node does not select a resolution from your VRAM or change the model's latent format.
+Custom sizes, including 512 x 512, and presets through 4K are available. Automatic nearest/down/up rounding aligns actual dimensions to 16 pixels; exact mode rejects unaligned sizes. Dimensions as small as 16 x 16 can be represented, but this is not a model-quality guarantee. Large resolutions require suitable hardware. Frame counts align to 4n+1 and actual duration is frame_count / FPS. One video per run; whole-number FPS only.
 
-## Updating from 1.0.7
+The native backend center-crops/resizes the reference image. A square source can therefore lose edges when the requested aspect ratio differs. The controller preserves native conditioning and masks, including the noise mask used by replace guidance.
 
-The node ID and all eight output sockets are unchanged. New resolution controls are optional and default to Custom / nearest, so existing valid resolutions keep their size. If the controls do not appear after updating, restart ComfyUI, refresh the browser and add a fresh Video Control node, then reconnect the existing wires. Width and height outputs always mean the actual generated dimensions.
+## Outputs
 
-## Timing example
+`latent`, `video_info`, `frame_count`, `fps`, `actual_duration_seconds`, `width`, `height`, `summary`, `positive`.
 
-At 25 FPS, 5 seconds becomes 125 frames and exactly 5 seconds. At 24 FPS, nearest rounding gives 121 frames and approximately 5.041667 seconds. Use **actual_duration_seconds** downstream.
+`positive` is modified image conditioning in image-to-video mode and is `None` in empty mode. Do not connect this output to a guider in empty mode; use your original text conditioning there.
 
-`nearest` chooses the closest valid frame count (ties upward); `at_least` rounds up; `at_most` rounds down. Minimum is one frame; very short requests can therefore exceed the requested duration.
+`video_info` is a VHS_VIDEOINFO dictionary of planned settings, not a video file and not a measurement of generated frames. `summary` connects to Preview as Text. Neither is empty simply because no downstream consumer is attached. If later processing changes timing or dimensions, update that metadata accordingly.
 
-## Development and validation
+## Install and update
 
-- `__init__.py`: ComfyUI controls, output types, tensor allocation and node registration.
-- `calculations.py`: timing, validation and metadata calculations.
-- `tests/test_node.py`: calculation checks and a mocked ComfyUI/PyTorch contract test.
+Install from `https://github.com/AmanDolorain/ComfyUI-Video-Control` using ComfyUI Manager or clone into `ComfyUI/custom_nodes`. Restart ComfyUI and refresh the browser. No extra pip requirements or model downloads are introduced. Image-to-video mode needs ComfyUI with the native backend installed. The extension imports that backend only when execution needs it.
 
-Run `python -m unittest discover -s tests -v` from this folder. These tests do not run real PyTorch allocation, model generation, or a complete ComfyUI workflow. A real workflow test is still required.
+After upgrading, save a workflow backup and add a fresh controller if the existing instance has not refreshed its sockets. Existing output indices and numeric widget order are preserved. Reconnect the three inputs and the new positive output explicitly. Keep the existing product, publisher and author names.
 
-## License
+## Verification
 
-MIT. See [LICENSE](LICENSE).
+Run `python -m unittest discover -s tests -v`. Tests cover planning, previous output positions, legacy empty mode, partial-input errors, native API forwarding, V3/tuple return handling, and preservation of native conditioning/masks. These are isolated tests with a mocked tensor/backend; they do not establish actual generation quality. A real ComfyUI model run is still required. See VERIFICATION.md.
 
-## Author credit display
-
-The frontend extension in `web/author.js` supports two rendering paths. In Vue Nodes 2.0 it mounts a non-interactive, muted credit inside the existing bottom badge row, right-aligned beside the package badge. If badges are hidden, it creates a compact footer row. In classic Canvas mode it uses a bottom-right drawing fallback. The extension removes its credit when the node is removed and handles collapse/expand and Vue remounts.
-
-This replaces the canvas-only approach from 1.1.5, which can show no author in Vue rendering. No backend input, output, tensor calculation or saved widget value is added. After updating, restart ComfyUI and hard-refresh the browser (Ctrl+F5). Actual ComfyUI rendering must still be verified in the installed frontend; the development checks are not an end-to-end ComfyUI test.
-
-## Names and discovery
-
-Search for **ComfyUI-Video-Control**. The Registry/Manager display name and the default canvas title both use that spelling, with hyphens. The category remains `ComfyUI/Video/Control`. The immutable package ID remains `comfyui-video-control`, and the registered node ID remains `VideoControl`, preserving workflow links. Existing saved workflows may retain their old node titles until a fresh node is added.
-
-The description includes duration, FPS, resolution presets, automatic rounding, empty latent and VHS metadata. Listing cache refresh and registry metadata processing can delay a title change. Search placement, ratings and ranking are controlled by the listing service; no top-position guarantee is made.
-
-## Manager title versus installed node title
-
-Manager's listing reads the Registry node-level name. The canvas title comes from NODE_DISPLAY_NAME_MAPPINGS in the installed Python package. Updating one does not immediately refresh the other. Registry has an Edit details form for the node name, independent of version history. Once the Registry title is ComfyUI-Video-Control, do not repeatedly rename it or publish additional code changes solely to refresh Manager. Wait for the Registry cache fetch to finish and reopen the list.
+The controller does not generate speech, force TTS duration, mix audio or perform lip sync.

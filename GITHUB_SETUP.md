@@ -1,3 +1,5 @@
+> Version 1.2.0 adds native image-to-video preparation. See README.md for the current socket contract and VERIFICATION.md for test limits. The existing GitHub workflows and .gitignore are unchanged.
+
 # Publishing Video Control on GitHub
 
 Author: Aman Dolorain
