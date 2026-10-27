@@ -1,6 +1,6 @@
 # Video Control
 
-**Author: Aman · Version: 1.1.0 · ComfyUI custom node**
+**Author: Aman · Version: 1.1.1 · ComfyUI custom node**
 
 One control node for video duration, FPS, resolution, an empty video latent, and planned VHS video metadata. Set the timing once and connect its outputs across your workflow.
 
@@ -16,6 +16,7 @@ One control node for video duration, FPS, resolution, an empty video latent, and
 - `VHS_VIDEOINFO` metadata without saving and reopening an intermediate video.
 - Actual duration output for an audio generator's duration input.
 - No model downloads, network calls or extra Python packages.
+- Visible `Author: Aman` credit inside the node, with author attribution in the description.
 
 ## Compatibility
 
@@ -100,3 +101,7 @@ Run `python -m unittest discover -s tests -v` from this folder. These tests do n
 ## License
 
 MIT. See [LICENSE](LICENSE).
+
+## Author credit display
+
+The frontend extension in `web/author.js` adds a read-only author label inside Video Control. It does not add a backend input or change output sockets. After updating, restart ComfyUI and hard-refresh the browser (Ctrl+F5). Add a fresh Video Control node if needed. Actual rendering must be verified in your ComfyUI frontend.

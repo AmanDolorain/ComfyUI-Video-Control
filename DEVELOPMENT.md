@@ -7,6 +7,7 @@ Author: Aman
 - `__init__.py` defines the node controls, outputs, execution method and registration.
 - `calculations.py` contains timing validation, frame rounding and metadata generation.
 - `tests/test_node.py` tests calculations and the runtime interface with mocked dependencies.
+- `web/author.js` adds a read-only author label using the frontend extension API.
 - `pyproject.toml` records package metadata, including the author and version.
 
 ## Build a custom node step by step

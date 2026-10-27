@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.1
+
+- Show a read-only Author: Aman label inside Video Control.
+- Add author attribution to the node description.
+- Keep node name, ID, inputs and outputs unchanged.
+
 ## 1.1.0
 
 - Accept custom dimensions in one-pixel increments.

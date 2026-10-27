@@ -9,7 +9,7 @@ The repository is https://github.com/AmanDolorain/ComfyUI-Video-Control. This up
 1. Extract this update ZIP and open the inner VideoControl directory.
 2. In the repository, choose Add file / Upload files.
 3. Upload the contents of that directory at the repository root, keeping the tests and .github subdirectories intact. Do not upload the outer folder or ZIP.
-4. Use the commit message `Add custom resolution rounding and 4K presets (v1.1.0)`.
+4. Use the commit message `Show author credit inside Video Control (v1.1.1)`.
 5. Check the Actions tab after committing. An actual ComfyUI generation test is still separate.
 6. Existing users can update their Git installation and restart ComfyUI.
 
