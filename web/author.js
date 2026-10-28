@@ -14,8 +14,8 @@ function makeCredit() {
         marginLeft: "0",
         flex: "0 0 auto",
         alignSelf: "center",
-        font: '600 10px/20px "Segoe UI", sans-serif',
-        letterSpacing: "0.45px",
+        font: '400 14px/20px Arial, sans-serif',
+        letterSpacing: "normal",
         color: "#ffffff",
         opacity: "1",
         whiteSpace: "nowrap",
@@ -67,7 +67,7 @@ function syncCredits() {
             const footer = document.createElement("div");
             footer.className = "video-control-credit-row";
             Object.assign(footer.style, {
-                display: "flex", alignItems: "center", justifyContent: "flex-end",
+                display: "flex", alignItems: "center", justifyContent: "flex-start",
                 boxSizing: "border-box", minHeight: "30px", flexShrink: "0",
                 margin: "0", padding: "5px 14px",
                 position: "absolute", left: "0", right: "0", bottom: "0",
@@ -93,6 +93,25 @@ function syncCredits() {
         }
         if (!state.label) state.label = makeCredit();
         if (state.label.parentElement !== row) row.append(state.label);
+        // Use the actual title text metrics, including its inset after the chevron.
+        const titleText = [...root.querySelectorAll("*")].find(el =>
+            !row.contains(el) && el.children.length === 0 &&
+            [node.title, "ComfyUI-Video-Control"].includes(el.textContent.trim())
+        );
+        if (titleText) {
+            const font = getComputedStyle(titleText);
+            for (const key of ["fontFamily", "fontSize", "fontWeight", "fontStyle", "lineHeight", "letterSpacing"]) {
+                if (state.label.style[key] !== font[key]) state.label.style[key] = font[key];
+            }
+            const rootRect = root.getBoundingClientRect();
+            const titleRect = titleText.getBoundingClientRect();
+            const scale = root.offsetWidth ? rootRect.width / root.offsetWidth : 1;
+            const inset = Math.max(0, (titleRect.left - rootRect.left) / (scale || 1));
+            const padding = `${inset}px`;
+            if (row.style.paddingLeft !== padding) row.style.paddingLeft = padding;
+        } else {
+            row.style.paddingLeft = "34px";
+        }
         state.root = root;
     }
 }
@@ -140,11 +159,11 @@ app.registerExtension({
                 ctx.beginPath();
                 ctx.roundRect(0, this.size[1] - 30, this.size[0], 30, [0, 0, 10, 10]);
                 ctx.fill();
-                ctx.font = "600 10px Segoe UI, sans-serif";
+                ctx.font = `${globalThis.LiteGraph?.NODE_TEXT_SIZE || 14}px Arial`;
                 ctx.fillStyle = "#ffffff";
-                ctx.textAlign = "right";
+                ctx.textAlign = "left";
                 ctx.textBaseline = "middle";
-                ctx.fillText("♪ Aman Dolorain", this.size[0] - 14, this.size[1] - 15);
+                ctx.fillText("♪ Aman Dolorain", 34, this.size[1] - 15);
             } finally { ctx.restore(); }
             return result;
         };
