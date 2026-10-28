@@ -67,31 +67,30 @@ function syncCredits() {
             const footer = document.createElement("div");
             footer.className = "video-control-credit-row";
             Object.assign(footer.style, {
-                display: "flex", alignItems: "center", justifyContent: "center",
+                display: "flex", alignItems: "center", justifyContent: "flex-end",
                 boxSizing: "border-box", minHeight: "30px", flexShrink: "0",
                 margin: "0", padding: "5px 14px",
-                width: "100%", borderRadius: "0 0 10px 10px",
+                position: "absolute", left: "0", right: "0", bottom: "0",
+                height: "30px", zIndex: "1", borderRadius: "0 0 10px 10px",
                 
             });
             root.append(footer);
             state.ownRow = footer;
         }
         row = state.ownRow;
-        // Sample the visible title bar so custom node colors and themes stay in sync.
-        const header = root.querySelector('[data-testid="node-header"], .lg-node-header, .node-header')
-            || [...root.children].find(el => el !== row && el !== body && !el.contains(body));
-        let color = node.color || "#2e3440";
-        if (header) {
-            const candidates = [header, ...header.querySelectorAll("*")];
-            for (const el of candidates) {
-                const bg = getComputedStyle(el).backgroundColor;
-                if (bg && bg !== "transparent" && bg !== "rgba(0, 0, 0, 0)") {
-                    color = bg;
-                    break;
-                }
-            }
+        // node.color is the title-bar color; bgcolor is the body color.
+        // Anchor inside the positioned node, never after its body in document flow.
+        const header = root.querySelector('[data-testid="node-header"], .lg-node-header, .node-header');
+        let color = node.color;
+        if (!color && header) {
+            const bg = getComputedStyle(header).backgroundColor;
+            if (bg !== "transparent" && bg !== "rgba(0, 0, 0, 0)") color = bg;
         }
-        if (row.style.backgroundColor !== color) row.style.backgroundColor = color;
+        color ||= globalThis.LiteGraph?.NODE_DEFAULT_COLOR || "#2e3440";
+        if (row.dataset.headerColor !== color) {
+            row.style.backgroundColor = color;
+            row.dataset.headerColor = color;
+        }
         if (!state.label) state.label = makeCredit();
         if (state.label.parentElement !== row) row.append(state.label);
         state.root = root;
@@ -133,18 +132,19 @@ app.registerExtension({
         const previousDraw = node.onDrawForeground;
         node.onDrawForeground = function (ctx, ...args) {
             const result = previousDraw?.call(this, ctx, ...args);
+            if (state.root?.isConnected && state.ownRow?.dataset.headerColor !== this.color) scheduleSync();
             if (this.flags?.collapsed || state.root?.isConnected) return result;
             ctx.save();
             try {
-                ctx.fillStyle = this.color || LiteGraph.NODE_DEFAULT_COLOR || "#2e3440";
+                ctx.fillStyle = this.color || globalThis.LiteGraph?.NODE_DEFAULT_COLOR || "#2e3440";
                 ctx.beginPath();
                 ctx.roundRect(0, this.size[1] - 30, this.size[0], 30, [0, 0, 10, 10]);
                 ctx.fill();
                 ctx.font = "600 10px Segoe UI, sans-serif";
                 ctx.fillStyle = "#ffffff";
-                ctx.textAlign = "center";
+                ctx.textAlign = "right";
                 ctx.textBaseline = "middle";
-                ctx.fillText("♪ Aman Dolorain", this.size[0] / 2, this.size[1] - 15);
+                ctx.fillText("♪ Aman Dolorain", this.size[0] - 14, this.size[1] - 15);
             } finally { ctx.restore(); }
             return result;
         };
