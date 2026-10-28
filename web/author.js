@@ -15,12 +15,12 @@ function makeCredit() {
         flex: "0 0 auto",
         alignSelf: "center",
         font: "10px/20px sans-serif",
-        color: "var(--descrip-text, #9aa0a6)",
-        opacity: "0.7",
+        color: "#ffffff",
+        opacity: "1",
         whiteSpace: "nowrap",
         pointerEvents: "none",
         userSelect: "none",
-        paddingRight: "4px",
+        padding: "6px 4px",
     });
     return label;
 }
@@ -50,7 +50,7 @@ function syncCredits() {
         );
         if (!body) continue;
         // NodeBadges.vue renders a direct .mt-auto flex row in the Vue node body.
-        // Put the credit IN that row so it shares the package badge's baseline.
+        // Reuse the footer row and remove only this package's old badge.
         let row = [...body.children].find(
             (element) => element.classList.contains("mt-auto") && element !== state.ownRow,
         );
@@ -69,6 +69,12 @@ function syncCredits() {
         } else if (state.ownRow) {
             state.ownRow.remove();
             state.ownRow = null;
+        }
+        // Hide the old package badge without hiding unrelated footer content.
+        for (const element of row.querySelectorAll("*")) {
+            if (["Video-Control", "ComfyUI-Video-Control"].includes(element.textContent.trim())) {
+                element.style.display = "none";
+            }
         }
         if (!state.label) state.label = makeCredit();
         if (state.label.parentElement !== row) row.append(state.label);
@@ -113,8 +119,7 @@ app.registerExtension({
             ctx.save();
             try {
                 ctx.font = "10px sans-serif";
-                ctx.fillStyle = "#9aa0a6";
-                ctx.globalAlpha *= 0.7;
+                ctx.fillStyle = "#ffffff";
                 ctx.textAlign = "right";
                 ctx.textBaseline = "middle";
                 ctx.fillText("Author: Aman Dolorain", this.size[0] - 12, this.size[1] - 18);
