@@ -8,19 +8,20 @@ let scheduled = false;
 function makeCredit() {
     const label = document.createElement("span");
     label.className = "video-control-author-credit";
-    label.textContent = "Author: Aman Dolorain";
-    label.title = "ComfyUI-Video-Control — Author: Aman Dolorain";
+    label.textContent = "♪ Aman Dolorain";
+    label.title = "ComfyUI-Video-Control — ♪ Aman Dolorain";
     Object.assign(label.style, {
         marginLeft: "auto",
         flex: "0 0 auto",
         alignSelf: "center",
-        font: "10px/20px sans-serif",
+        font: '600 10px/20px "Segoe UI", sans-serif',
+        letterSpacing: "0.45px",
         color: "#ffffff",
         opacity: "1",
         whiteSpace: "nowrap",
         pointerEvents: "none",
         userSelect: "none",
-        padding: "6px 4px",
+        padding: "0",
     });
     return label;
 }
@@ -54,28 +55,27 @@ function syncCredits() {
         let row = [...body.children].find(
             (element) => element.classList.contains("mt-auto") && element !== state.ownRow,
         );
-        if (!row) {
-            if (!state.ownRow?.isConnected) {
-                const footer = document.createElement("div");
-                footer.className = "video-control-credit-row";
-                Object.assign(footer.style, {
-                    display: "flex", alignItems: "center", minHeight: "24px",
-                    marginTop: "auto", padding: "0 8px", flexShrink: "0",
-                });
-                body.append(footer);
-                state.ownRow = footer;
-            }
-            row = state.ownRow;
-        } else if (state.ownRow) {
-            state.ownRow.remove();
-            state.ownRow = null;
-        }
-        // Hide the old package badge without hiding unrelated footer content.
-        for (const element of row.querySelectorAll("*")) {
-            if (["Video-Control", "ComfyUI-Video-Control"].includes(element.textContent.trim())) {
-                element.style.display = "none";
+        // Keep branding in its own reserved footer, apart from controls.
+        if (row) {
+            for (const element of row.querySelectorAll("*")) {
+                if (["Video-Control", "ComfyUI-Video-Control"].includes(element.textContent.trim())) {
+                    element.style.display = "none";
+                }
             }
         }
+        if (!state.ownRow?.isConnected) {
+            const footer = document.createElement("div");
+            footer.className = "video-control-credit-row";
+            Object.assign(footer.style, {
+                display: "flex", alignItems: "center", justifyContent: "flex-end",
+                boxSizing: "border-box", minHeight: "48px", flexShrink: "0",
+                margin: "18px 14px 0", padding: "12px 2px 14px",
+                borderTop: "1px solid rgba(255,255,255,0.12)",
+            });
+            body.append(footer);
+            state.ownRow = footer;
+        }
+        row = state.ownRow;
         if (!state.label) state.label = makeCredit();
         if (state.label.parentElement !== row) row.append(state.label);
         state.root = root;
@@ -110,7 +110,7 @@ app.registerExtension({
         const previousComputeSize = node.computeSize;
         node.computeSize = function (...args) {
             const size = previousComputeSize.apply(this, args);
-            return [Math.max(size[0], 300), size[1] + 24];
+            return [Math.max(size[0], 300), size[1] + 66];
         };
         const previousDraw = node.onDrawForeground;
         node.onDrawForeground = function (ctx, ...args) {
@@ -118,11 +118,16 @@ app.registerExtension({
             if (this.flags?.collapsed || state.root?.isConnected) return result;
             ctx.save();
             try {
-                ctx.font = "10px sans-serif";
+                ctx.strokeStyle = "rgba(255,255,255,0.12)";
+                ctx.beginPath();
+                ctx.moveTo(14, this.size[1] - 46);
+                ctx.lineTo(this.size[0] - 14, this.size[1] - 46);
+                ctx.stroke();
+                ctx.font = "600 10px Segoe UI, sans-serif";
                 ctx.fillStyle = "#ffffff";
                 ctx.textAlign = "right";
                 ctx.textBaseline = "middle";
-                ctx.fillText("Author: Aman Dolorain", this.size[0] - 12, this.size[1] - 18);
+                ctx.fillText("♪ Aman Dolorain", this.size[0] - 16, this.size[1] - 24);
             } finally { ctx.restore(); }
             return result;
         };
