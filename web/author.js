@@ -11,7 +11,7 @@ function makeCredit() {
     label.textContent = "♪ Aman Dolorain";
     label.title = "ComfyUI-Video-Control — ♪ Aman Dolorain";
     Object.assign(label.style, {
-        marginLeft: "auto",
+        marginLeft: "0",
         flex: "0 0 auto",
         alignSelf: "center",
         font: '600 10px/20px "Segoe UI", sans-serif',
@@ -67,15 +67,31 @@ function syncCredits() {
             const footer = document.createElement("div");
             footer.className = "video-control-credit-row";
             Object.assign(footer.style, {
-                display: "flex", alignItems: "center", justifyContent: "flex-end",
-                boxSizing: "border-box", minHeight: "48px", flexShrink: "0",
-                margin: "18px 14px 0", padding: "12px 2px 14px",
-                borderTop: "1px solid rgba(255,255,255,0.12)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                boxSizing: "border-box", minHeight: "30px", flexShrink: "0",
+                margin: "0", padding: "5px 14px",
+                width: "100%", borderRadius: "0 0 10px 10px",
+                
             });
-            body.append(footer);
+            root.append(footer);
             state.ownRow = footer;
         }
         row = state.ownRow;
+        // Sample the visible title bar so custom node colors and themes stay in sync.
+        const header = root.querySelector('[data-testid="node-header"], .lg-node-header, .node-header')
+            || [...root.children].find(el => el !== row && el !== body && !el.contains(body));
+        let color = node.color || "#2e3440";
+        if (header) {
+            const candidates = [header, ...header.querySelectorAll("*")];
+            for (const el of candidates) {
+                const bg = getComputedStyle(el).backgroundColor;
+                if (bg && bg !== "transparent" && bg !== "rgba(0, 0, 0, 0)") {
+                    color = bg;
+                    break;
+                }
+            }
+        }
+        if (row.style.backgroundColor !== color) row.style.backgroundColor = color;
         if (!state.label) state.label = makeCredit();
         if (state.label.parentElement !== row) row.append(state.label);
         state.root = root;
@@ -90,10 +106,12 @@ function scheduleSync() {
 
 function observeNodes() {
     if (observer) return;
-    observer = new MutationObserver(scheduleSync);
+    observer = new MutationObserver(records => {
+        if (records.some(record => !record.target.closest?.(".video-control-credit-row"))) scheduleSync();
+    });
     observer.observe(document.body, {
         childList: true, subtree: true, attributes: true,
-        attributeFilter: ["data-collapsed", "data-node-id"],
+        attributeFilter: ["data-collapsed", "data-node-id", "class", "style"],
     });
 }
 
@@ -110,7 +128,7 @@ app.registerExtension({
         const previousComputeSize = node.computeSize;
         node.computeSize = function (...args) {
             const size = previousComputeSize.apply(this, args);
-            return [Math.max(size[0], 300), size[1] + 66];
+            return [Math.max(size[0], 300), size[1] + 30];
         };
         const previousDraw = node.onDrawForeground;
         node.onDrawForeground = function (ctx, ...args) {
@@ -118,16 +136,15 @@ app.registerExtension({
             if (this.flags?.collapsed || state.root?.isConnected) return result;
             ctx.save();
             try {
-                ctx.strokeStyle = "rgba(255,255,255,0.12)";
+                ctx.fillStyle = this.color || LiteGraph.NODE_DEFAULT_COLOR || "#2e3440";
                 ctx.beginPath();
-                ctx.moveTo(14, this.size[1] - 46);
-                ctx.lineTo(this.size[0] - 14, this.size[1] - 46);
-                ctx.stroke();
+                ctx.roundRect(0, this.size[1] - 30, this.size[0], 30, [0, 0, 10, 10]);
+                ctx.fill();
                 ctx.font = "600 10px Segoe UI, sans-serif";
                 ctx.fillStyle = "#ffffff";
-                ctx.textAlign = "right";
+                ctx.textAlign = "center";
                 ctx.textBaseline = "middle";
-                ctx.fillText("♪ Aman Dolorain", this.size[0] - 16, this.size[1] - 24);
+                ctx.fillText("♪ Aman Dolorain", this.size[0] / 2, this.size[1] - 15);
             } finally { ctx.restore(); }
             return result;
         };
